@@ -8,7 +8,7 @@ This project shares code for colleboration on the video analysis project.
 # Project Roadmap
 ## 1. Video Cleaning for both historical and modern videos
 - [x] Seperate videos into scenes, and pick the scenes lasted more than 15 video seconds. `done`
-- [ ] Export example frames for each selected scene `in progress`
+- [x] Export example frames for each selected scene `done`
 - [ ] Generate geotiff via QGIS from each example frame. See method [here](https://docs.google.com/document/d/17b7tm3fHhAhNPlTBfhLpZodYa7NLsZ7xV14CJxv3Gwc/edit?usp=share_link) `in progress`
 - [ ] Locate location of all videos and scenes `in progress`
 - [ ] Classify location type of all videos and scenes `in progress`
