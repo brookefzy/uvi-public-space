@@ -1,3 +1,7 @@
+# Data Organization
+* Transactional data: /home/yuanzf/WW/_data (10.89.0.59)
+* Static data: NAS server /home/Arianna drive (10.89.0.29)
+
 # Script Organization
 ## 1. Split historical to scenes (Manual work)
 Historical videos are seperated into different scenes: refer to googl sheet: https://docs.google.com/spreadsheets/d/1djLf9Uhh1zJpPBiSyjTnZ_EkkP1uZf2L8Rg8XWmXKlY/edit#gid=1319519320
@@ -72,9 +76,9 @@ Refer to the tutorial on google doc:
 # Data Folder Structure
 ```
 ../_data
-├── 00_raw                         #  all raw video data
+├── 00_raw                         # all raw video data
 ├── 02_siteplan                    # all plans for georeference (modern videos)
-├── 03_tracking_result             # all video tracking examples in video format
+├── 03_tracking_result             # all video tracking results
 ├── 05_tracking_result_projected   # this folder contains files used for group behavior detection
 ├── 08_historical_valid_scene      # Historical videos were divided into scenes, sample frames, and geo-referenced frames
 ├── 10_clean                       # Cleaned data for visualization and analysis
