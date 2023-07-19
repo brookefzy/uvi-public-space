@@ -62,10 +62,10 @@ Refer to the tutorial on google doc:
 ./12_data_summary_viz.ipynb
 
 ## Group Threshold Experiments
-20230710: 4 second staying together minimum, link correlation >0
-20230711: loose definition: 1 second staying together, link correlation >0
-20230711b: loose defintiion: 1 second staying together, disregarding link correlation
-20230711c: 1 second staying together, link correlation x AND y direction >0 or all people in a group stopped (speed<0.5)
+* 20230710: 4 second staying together minimum, link correlation >0
+* 20230711: loose definition: 1 second staying together, link correlation >0
+* 20230711b: loose defintiion: 1 second staying together, disregarding link correlation
+* 20230711c: 1 second staying together, link correlation x AND y direction >0 or all people in a group stopped (speed<0.5)
 **20230711d (final pick)**: 1 second staying together, link correlation x OR y direction >0 or all people in a group stopped (speed<0.5)
 
 
