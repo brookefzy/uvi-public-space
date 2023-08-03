@@ -92,4 +92,4 @@ index of historical videos (here)[https://docs.google.com/spreadsheets/d/1djLf9U
 Most recent presentation file (here)[https://docs.google.com/presentation/d/1v8cMoHUJudcKl3XI_d4tk5g912uy_agu-fPuDWOD-cg/edit?usp=sharing]
 
 # Methodology docs
-Documentation on detail methodologies (here)[https://docs.google.com/document/d/17b7tm3fHhAhNPlTBfhLpZodYa7NLsZ7xV14CJxv3Gwc/edit?usp=drive_link]
+Documentation on detail methodologies (here)[https://docs.google.com/document/d/17b7tm3fHhAhNPlTBfhLpZodYa7NLsZ7xV14CJxv3Gwc/edit?usp=drive_link]# mapboxjs
