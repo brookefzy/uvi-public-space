@@ -1,5 +1,6 @@
 # Data Organization
-* The original video data is subject to agreement that we can not disclose directly. This repo described the process from video data to group behavior calculation.
+* The original video data is subject to the agreement that we can not disclose directly. This repo described the process from video data to group behavior calculation.
+* The aggregated data used for analysis can be requested from the authors.
 
 # Script Organization
 ## 1. Split historical to scenes (Manual work)
@@ -70,19 +71,6 @@ Refer to the tutorial on google doc:
 * 20230711b: loose defintiion: 1 second staying together, disregarding link correlation
 * 20230711c: 1 second staying together, link correlation x AND y direction >0 or all people in a group stopped (speed<0.5)
 **20230711d (final pick)**: 1 second staying together, link correlation x OR y direction >0 or all people in a group stopped (speed<0.5)
-
-
-# Data Folder Structure
-```
-../_data
-├── 00_raw                         # all raw video data
-├── 02_siteplan                    # all plans for georeference (modern videos)
-├── 03_tracking_result             # all video tracking results
-├── 05_tracking_result_projected   # this folder contains files used for group behavior detection
-├── 08_historical_valid_scene      # Historical videos were divided into scenes, sample frames, and geo-referenced frames
-├── 10_clean                       # Cleaned data for visualization and analysis
-└── 98_demo                        # Video example to show the detection, stay and group behaviors
-```
 
 # Data indexing
 index of historical videos (here)[https://docs.google.com/spreadsheets/d/1djLf9Uhh1zJpPBiSyjTnZ_EkkP1uZf2L8Rg8XWmXKlY/edit?usp=sharing].
