@@ -1,6 +1,5 @@
 # Data Organization
-* Transactional data: /home/yuanzf/WW/_data (10.89.0.59)
-* Static data: NAS server /home/Arianna drive (10.89.0.29)
+* The original video data is subject to agreement that we can not disclose directly. This repo described the process from video data to group behavior calculation.
 
 # Script Organization
 ## 1. Split historical to scenes (Manual work)
