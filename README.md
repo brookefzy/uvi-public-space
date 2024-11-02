@@ -3,11 +3,12 @@
 * The aggregated data used for analysis can be requested from the authors.
 
 # Script Organization
-## 1. Split historical to scenes (Manual work)
+## Historical Video Preprocessing
+### 1. Split historical to scenes (Manual work)
 Historical videos are seperated into different scenes: refer to googl sheet: https://docs.google.com/spreadsheets/d/1djLf9Uhh1zJpPBiSyjTnZ_EkkP1uZf2L8Rg8XWmXKlY/edit#gid=1319519320
 Valid scenes are saved under: `../_data/08_historical_valid_scene/Scenes`
 
-## Flip the video vertically and augment the video to make up the skipped intervals
+#### Flip the video vertically and augment the video to make up the skipped intervals
 Each scene is first flipped then augment to 16 times (GPU required) Tool: https://github.com/megvii-research/ECCV2022-RIFE
 Flipped videos saved under: `../_data/08_historical_valid_scene/Scenes_r` (some videos are flipped in server directly)
 
@@ -16,16 +17,16 @@ cd ECCV2022-RIFE
 python3 inference_video.py --exp=4 --video=/lustre1/g/geog_pyloo/06_WW/_raw/video_historical_scenes_r/B11_G1_Env3_0001-Scene-001.mp4 --output=/lustre1/g/geog_pyloo/06_WW/_raw/video_historical_scenes_r_4x/B11_G1_Env3_0001-Scene-001.mp4
 ```
 
-## 2. Generate frames from videos for labeling
+### 2. Generate frames from videos for labeling
 ```
 ./process_current_videos/00_generate_frame_labeling.ipynb
 ```
 
-## 3. Label the image via ROBOFLOW
+### 3. Label the image via ROBOFLOW
 https://app.roboflow.com/hkupyloo/historical-video-pedestrian-detection/3
 
-## 4. Training and Deployment
-### Historical video uses YOLOv5 + Deepsort retrained model
+### 4. Training and Deployment
+#### Historical video uses YOLOv5 + Deepsort retrained model
 1. Train YOLOv5 detection on 70 frames- (tutorial)[https://github.com/ultralytics/yolov5]
 2. Current new version created and finetuned for this project (here)[https://github.com/brookefzy/uvi-yolov5-deepsort]
 3. Combine the YOLOv5 new weights with Deepsort and make prediction. Results here: 
@@ -44,13 +45,13 @@ python deploy/pipeline/pipeline_no_video_output.py \
         
 ```
 
-## 6. Georeferencing:
-Refer to the tutorial on google doc: 
+### 6. Georeferencing and image transformation
+Refer to the tutorial on [medium](https://medium.com/radiant-earth-insights/duckdb-the-indispensable-geospatial-tool-you-didnt-know-you-were-missing-5fe11c5633e5#id_token=eyJhbGciOiJSUzI1NiIsImtpZCI6ImU4NjNmZTI5MmZhMmEyOTY3Y2Q3NTUxYzQyYTEyMTFiY2FjNTUwNzEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIyMTYyOTYwMzU4MzQtazFrNnFlMDYwczJ0cDJhMmphbTRsamRjbXMwMHN0dGcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiIyMTYyOTYwMzU4MzQtazFrNnFlMDYwczJ0cDJhMmphbTRsamRjbXMwMHN0dGcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDk0NDcwMTU2NjQxMzc0NDQwNDEiLCJlbWFpbCI6Inl1YW56ZmFuMTZAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5iZiI6MTczMDU0NzQ2MCwibmFtZSI6IlpodWFuZ3l1YW4gRmFuIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0wtd1pscjRYSGpvU2RRMl9pN2N4c3dSUlgxdEFwOXRXaVBPWnpjZUptSU5MS3cxZz1zOTYtYyIsImdpdmVuX25hbWUiOiJaaHVhbmd5dWFuIiwiZmFtaWx5X25hbWUiOiJGYW4iLCJpYXQiOjE3MzA1NDc3NjAsImV4cCI6MTczMDU1MTM2MCwianRpIjoiNWUyOWNmMDAzMzczYTdhOWY2ZmM1ZTY5MmI2NjU0YzRlYjMwZTI5YiJ9.STRO_qmCBGKZDdGylwof-w-MPJOMoE3GKYIKU-KhXfy3jsEhHaBpRSc8qGVtFrP3BlN23hVtXBIO7a8YyMFyqDmea-86aSrhhk15YPby-SUj7ce42KNMA5bZVHkS_r2wuDwVbWVaaVIAyo1QdikpngdVBpFxuzPqXWiZpSqjxrK47iiP7OBxFHl8pDkCI8LIRg13Hh0mhwaXwNs3yub1C4XMpi9FpEAmz2lX4Y7skA8b4hGGnvW00OPZrbECTp7ZGvL3PhH88SlgT0RwNJcOskNArZF1nQ_UWe1J679-0dMNOCwD4vUIEqpvXNHkZFdlnZtIuyt3c1U4Qke61Tof_g): 
 1. All frame sample for transformation in: `../_data/08_historical_valid_scene/Frames`
 2. Transformed points: `../_data/08_historical_valid_scene/Frames`
 3. Transformed points for current videos: 
 
-## 7. Processing steps:
+### 7. Processing steps:
 1. 02_detection_projection*: project the data to real world coordinates
 2. 03_speed_comp.ipynb
 * detecting jumping tracks and assign the track_id to a new person
