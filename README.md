@@ -52,7 +52,7 @@ Refer to the tutorial on [medium](https://medium.com/radiant-earth-insights/duck
 3. Transformed points for current videos: 
 
 ### 7. Processing steps:
-1. 02_detection_projection*: project the data to real world coordinates
+1. 02_detection_projection*: project the data to real-world coordinates
 2. 03_speed_comp.ipynb
 * detecting jumping tracks and assign the track_id to a new person
 * compute speed at given time interval.
