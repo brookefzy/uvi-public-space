@@ -1,0 +1,4 @@
+./_data/*
+./archive/*
+*/__pycache__/*
+*.csv
