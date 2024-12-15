@@ -20,7 +20,6 @@ METADATA = {
     "speed_x_0.5s": "speed in meter per second in x direction",
     "speed_y_0.5s": "speed in meter per second in y direction",
     "hex_id": "h3 level 15 index",
-    "inside": "inside the comparable area (both historical and current) or not",
     "frame_id": "reconstructed frame_id, across videos in a location, unique within one location",
     "frame_id_original": "original frame_id from the tracking file",
     "second_from_start": "calculated second from start based on the frame_id, 48 frames per real second",
@@ -36,8 +35,6 @@ METADATA = {
     "group_track_delta": "difference between group_first_frame and track_first_frame",
     "emerging_group": "whether the group is newly formed or not",
     "cross_frame_group_id": "this is a group id that can be used to identify the group across frames (only available for current videos)",
-    "gender": "gender of each pedestrian",
-    "age": "age of each pedestrian",
     "timestamp": "timestamp of each frame (Only available for modern videos). use for reference.",
 }
 
