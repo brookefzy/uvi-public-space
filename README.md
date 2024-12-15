@@ -16,7 +16,8 @@ run `main.py` to transform the sample csv and get group detection results
 **Sample data is available from researchers upon requests**
 
 ## Citation
-```@techreport{salazar2024shifting,
+```
+@techreport{salazar2024shifting,
   title={Shifting Patterns of Social Interaction: Exploring the Social Life of Urban Spaces Through AI},
   author={Salazar-Miranda, Arianna and Fan, Zhuangyuan and Baick, Michael B and Hampton, Keith N and Duarte, Fabio and Loo, Becky PY and Glaeser, Edward L and Ratti, Carlo},
   year={2024},
