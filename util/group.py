@@ -16,9 +16,9 @@ METADATA = {
     "lat": "prejected latitude",
     "lon": "prejected longitude",
     "track_id_backup": "original track id from the tracking file",
-    "speed_0.5s": "speed in meter per second",
-    "speed_x_0.5s": "speed in meter per second in x direction",
-    "speed_y_0.5s": "speed in meter per second in y direction",
+    "speed_{n}s": "speed in meter per second",
+    "speed_x_{n}s": "speed in meter per second in x direction",
+    "speed_y_{n}s": "speed in meter per second in y direction",
     "hex_id": "h3 level 15 index",
     "frame_id": "reconstructed frame_id, across videos in a location, unique within one location",
     "frame_id_original": "original frame_id from the tracking file",
@@ -38,8 +38,14 @@ METADATA = {
     "timestamp": "timestamp of each frame (Only available for modern videos). use for reference.",
 }
 
-SELCOLS = list(METADATA.keys())
-VALID_THREAD = 2
+N = 2
+VALID_THREAD = 0  # set this back to 2 later
+
+
+def get_selcols(n=N):
+    # format METADATA
+    metadata = {x.format(n=n): y for x, y in METADATA.items()}
+    return list(metadata.keys())
 
 
 def generatecluster(df, dis, epsg):
@@ -417,12 +423,13 @@ def link_method(traceGDF, DBSocial, DBcluster, df_links_valid, fps, interpolatio
         },
         inplace=True,
     )
-    exportcols = [x for x in SELCOLS if x in DBcluster_update.columns]
+    selcols = get_selcols()
+    exportcols = [x for x in selcols if x in DBcluster_update.columns]
     assert DBcluster_update.shape[0] == traceGDF.shape[0]
     return DBcluster_update[exportcols]
 
 
-def generate_group_final(traceGDF, fps=29.97):
+def generate_group_final(traceGDF, fps=29.97, n=0.5):
     traceGDF["appear_sec"] = (
         traceGDF.groupby("track_id")["frame_id"].transform("count") / fps
     )
@@ -432,18 +439,20 @@ def generate_group_final(traceGDF, fps=29.97):
     traceGDF = traceGDF[traceGDF["appear_sec"] > VALID_THREAD].reset_index(drop=True)
     n_after = traceGDF.shape[0]
     print("after drop", n_after)
-    print("keeping tracks that appear more than 2 seconds:", n_after / n_ori)
+    print(
+        f"keeping tracks that appear more than {VALID_THREAD} seconds:", n_after / n_ori
+    )
     if n_after == 0:
         print("no data remain")
-    DBSocial, DBcluster = generate_social(traceGDF, 3857, dis=1.9)
+    DBSocial, DBcluster = generate_social(traceGDF, 3857, dis=2.1)
     iditem = "group_id_social"
     df_links = getuvperframe(DBSocial, iditem)
     df_links = (
         df_links.groupby(["u", "v"]).size().reset_index().rename(columns={0: "weight"})
     )
-    df_links = df_links[df_links["weight"] > 1 * fps].reset_index(drop=True)
+    df_links = df_links[df_links["weight"] > 0.25 * fps].reset_index(drop=True)
     df_links["coor_ls"] = df_links.apply(
-        lambda x: valid_link_corr(DBSocial, x["u"], x["v"], n=0.5), axis=1
+        lambda x: valid_link_corr(DBSocial, x["u"], x["v"], n=n), axis=1
     )
     df_links["valid"] = np.where(
         df_links["coor_ls"].apply(lambda x: x[0] > 0.0 or x[1] > 0.0), True, False
