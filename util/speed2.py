@@ -8,6 +8,34 @@ from shapely.geometry import Point
 
 def get_speed_vector(keepGDF, n=0.5, fps=29.97, globalcrs="EPSG:3857"):
     """This function calculate the speed vector for each track"""
+    # Interpolate the missing lat lon for each track_id, frame_id combination
+    frame_id_min_max = (
+        keepGDF.groupby("track_id")["frame_id"].agg(["min", "max"]).reset_index()
+    )
+
+    # Create a new dataframe with all frame_ids for each track
+    all_frames = pd.DataFrame(
+        [
+            {"track_id": row["track_id"], "frame_id": frame_id}
+            for track_id, row in frame_id_min_max.iterrows()
+            for frame_id in range(row["min"], row["max"] + 1)
+        ]
+    )
+
+    # Merge with the original dataframe to get the existing lat and lon
+    keepGDF = all_frames.merge(
+        keepGDF[["track_id", "frame_id", "lat", "lon"]],
+        on=["track_id", "frame_id"],
+        how="left",
+    )
+
+    # Interpolate the missing lat and lon
+    keepGDF["lat"] = keepGDF.groupby("track_id")["lat"].apply(
+        lambda group: group.interpolate()
+    )
+    keepGDF["lon"] = keepGDF.groupby("track_id")["lon"].apply(
+        lambda group: group.interpolate()
+    )
     keepGDF = gpd.GeoDataFrame(
         keepGDF,
         geometry=[Point(x, y) for x, y in zip(keepGDF["lon"], keepGDF["lat"])],
@@ -37,17 +65,6 @@ def get_speed_vector(keepGDF, n=0.5, fps=29.97, globalcrs="EPSG:3857"):
         on=["track_id", "frame_id"],
         how="left",
     )
-
-    testgdf["track_id_backup"] = testgdf["track_id"]
-    testgdf["track_id_break"] = np.where(testgdf["dist"] > 1, 1, 0)
-    testgdf["track_id_update"] = testgdf["track_id_break"].fillna(0).astype(int)
-    testgdf["track_id_update"] = testgdf.groupby("track_id")["track_id_update"].cumsum()
-    testgdf["track_id_combo"] = (
-        testgdf["track_id"].astype(int).astype(str)
-        + "_"
-        + testgdf["track_id_update"].astype(str)
-    )
-    testgdf["track_id"] = testgdf["track_id_combo"]
 
     # calculate individual walking speed at each frame
     # step 1: calculate distance between every n seconds
@@ -87,6 +104,17 @@ def get_speed_vector(keepGDF, n=0.5, fps=29.97, globalcrs="EPSG:3857"):
     )
     keepGDF[f"speed_x_{n}s"] = keepGDF[f"dist_x_{n}s"] / n
     keepGDF[f"speed_y_{n}s"] = keepGDF[f"dist_y_{n}s"] / n
+
+    keepGDF["track_id_backup"] = keepGDF["track_id"]
+    # keepGDF["track_id_break"] = np.where(keepGDF["dist"] > 1, 1, 0)
+    # keepGDF["track_id_update"] = keepGDF["track_id_break"].fillna(0).astype(int)
+    # keepGDF["track_id_update"] = keepGDF.groupby("track_id")["track_id_update"].cumsum()
+    # keepGDF["track_id_combo"] = (
+    #     keepGDF["track_id"].astype(int).astype(str)
+    #     + "_"
+    #     + keepGDF["track_id_update"].astype(str)
+    # )
+    # keepGDF["track_id"] = keepGDF["track_id_combo"]
     import gc
 
     gc.collect()
