@@ -19,6 +19,19 @@ video_start_frame = 0
 loc_name = "bryant_park"
 
 
+def load_video(videoname, video_start_at, video_group, destfolder, video_start_frame=0):
+    # Load the video data
+    traceGDF = pd.read_csv(
+        os.path.join(destfolder, f"{videoname}_projected.csv"),
+        parse_dates=["timestamp"],
+    )
+    traceGDF["frame"] = traceGDF["frame"] + video_start_frame
+    traceGDF["video_group"] = video_group
+    traceGDF["video_start_at"] = video_start_at
+    traceGDF["video_start_frame"] = video_start_frame
+    return traceGDF
+
+
 def main():
     traceGDF = load_video(
         videoname,
