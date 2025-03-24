@@ -95,24 +95,6 @@ def generate_social(traceGDF, epsg, dis=1.9):
     return DBSocial, DBcluster
 
 
-def valid_link(DBSocial, x, y, thred=0.1, n=1):
-    samplegroup = DBSocial[DBSocial["track_id"].isin([x, y])]
-    # calculate the speed_x, speed_y correlation between track 10 and 11
-    df_wide = samplegroup.pivot(
-        index="frame_id",
-        columns="track_id",
-        values=[f"speed_x_{n}s", f"speed_y_{n}s", f"speed_{n}s"],
-    ).reset_index()
-    # calculate the correlation
-    df_wide = df_wide.dropna()
-    coor1 = df_wide[(f"speed_x_{n}s", x)].corr(df_wide[(f"speed_x_{n}s", y)])
-    coor2 = df_wide[(f"speed_y_{n}s", x)].corr(df_wide[(f"speed_y_{n}s", y)])
-    coor3 = df_wide[(f"speed_{n}s", x)].corr(df_wide[(f"speed_{n}s", y)])
-    if coor1 > thred and coor2 > thred:
-        return True
-    else:
-        return False
-
 
 def getuvperframe(testdf, iditem):
     #     testdf = effDF[effDF['frame_id'] == frameid]
@@ -133,7 +115,7 @@ def getuvperframe(testdf, iditem):
     return dfframe
 
 
-def valid_link_corr(DBSocial, x, y, thred=0.5, n=1):
+def valid_link_corr(DBSocial, x, y, n=1, fps = 29.97):
     samplegroup = DBSocial[DBSocial["track_id"].isin([x, y])]
     # calculate the speed_x, speed_y correlation between track 10 and 11
     df_wide = samplegroup.pivot(
@@ -144,25 +126,22 @@ def valid_link_corr(DBSocial, x, y, thred=0.5, n=1):
     # calculate the correlation
     df_wide = df_wide.dropna()
 
-    coor1 = (
+    # check the x-speed differences
+    coor1 = df_wide[(f"speed_x_{n}s", x)].mean() - df_wide[(f"speed_x_{n}s", y)].mean()
+    coor2 = df_wide[(f"speed_y_{n}s", x)].mean() - df_wide[(f"speed_y_{n}s", y)].mean()
+    coor3x = np.mean(
         df_wide[(f"speed_x_{n}s", x)]
-        .fillna(0)
-        .corr(df_wide[(f"speed_x_{n}s", y)].fillna(0))
+        .fillna(0)*(df_wide[(f"speed_x_{n}s", y)].fillna(0))>0
     )
-    coor2 = (
+    coor3y = np.mean(
         df_wide[(f"speed_y_{n}s", x)]
-        .fillna(0)
-        .corr(df_wide[(f"speed_y_{n}s", y)].fillna(0))
+        .fillna(0)*(df_wide[(f"speed_y_{n}s", y)].fillna(0))>0
     )
-    coor3 = (
-        df_wide[(f"speed_{n}s", x)]
-        .fillna(0)
-        .corr(df_wide[(f"speed_{n}s", y)].fillna(0))
-    )
+    coor3 = (coor3x+coor3y)/2
     # corr4 is a stay indicator, if both speed_{n}s <0.5, thenn it is a stay
     speed_mean1 = df_wide[(f"speed_{n}s", x)].mean()
     speed_mean2 = df_wide[(f"speed_{n}s", y)].mean()
-    if speed_mean1 < 0.5 and speed_mean2 < 0.5:
+    if speed_mean1 < 0.5 and speed_mean2 < 0.5 and df_wide.shape[0]>2*fps:
         coor4 = 1
     else:
         coor4 = 0
@@ -426,25 +405,35 @@ def generate_group_final(traceGDF, fps=29.97, n=0.5):
     )
     if n_after == 0:
         print("no data remain")
-    DBSocial, DBcluster = generate_social(traceGDF, 3857, dis=1.9)
+    DBSocial, DBcluster = generate_social(traceGDF, 3857, dis=1.5)
     iditem = "group_id_social"
     df_links = getuvperframe(DBSocial, iditem)
     df_links = (
         df_links.groupby(["u", "v"]).size().reset_index().rename(columns={0: "weight"})
     )
-    df_links = df_links[df_links["weight"] > 0.25 * fps].reset_index(drop=True)
+    df_links = df_links[df_links["weight"] > 2 * fps].reset_index(drop=True)
     ## loose the threshold for historical videos, 0.25 for viz in 2010, 0.1 for viz in 1980
     df_links["coor_ls"] = df_links.apply(
-        lambda x: valid_link_corr(DBSocial, x["u"], x["v"], n=n), axis=1
+        lambda x: valid_link_corr(DBSocial, x["u"], x["v"], n=n, fps = fps), axis=1
     )
+    # df_links["valid"] = np.where(
+    #     df_links["coor_ls"].apply(lambda x: x[0] >= 0.1 and x[1] >= 0.1), True, False
+    # ) 
+    # links are valid if all people moving in the same direction (both x and y)
     df_links["valid"] = np.where(
-        df_links["coor_ls"].apply(lambda x: x[0] >= 0.0 or x[1] >= 0.0), True, False
+        df_links["coor_ls"].apply(lambda x: x[2] > 0.5), True, False
+    )
+    
+    # if the speed differences between two people are too large, then it is not a group
+    df_links["valid"] = np.where(
+        df_links["coor_ls"].apply(lambda x: abs(x[0]) > 0.5 and abs(x[1]) > 0.5), False, df_links["valid"]
     )
 
     # links are valid if all people in a group are staying
     df_links["valid"] = np.where(
         df_links["coor_ls"].apply(lambda x: x[3] > 0), True, df_links["valid"]
     )
+    
 
     df_links_valid = df_links[(df_links["valid"] == True)].reset_index(drop=True)
     DBcluster_update = link_method(

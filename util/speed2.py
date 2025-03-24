@@ -45,9 +45,9 @@ def get_speed_vector(keepGDF, n=0.5, fps=29.97, globalcrs="EPSG:3857"):
     testgdf = keepGDF[keepGDF["geometry"].isnull() == False].reset_index(drop=True)
     print(testgdf.shape[0], " remaining after dropping null geometry")
     testgdf = testgdf[
-        testgdf["track_id"].map(testgdf["track_id"].value_counts()) > 1
+        testgdf["track_id"].map(testgdf["track_id"].value_counts()) > fps/2 # this is for the modern video processing.
     ].reset_index(drop=True)
-    print(testgdf.shape[0], " remaining after dropping track_id with only one frame")
+    print(testgdf.shape[0], f" remaining after dropping track_id with only {fps/2} frame")
 
     # remove the outlier - break the track id if the distance is too large
     testgdf_shift = testgdf.copy()
@@ -106,15 +106,6 @@ def get_speed_vector(keepGDF, n=0.5, fps=29.97, globalcrs="EPSG:3857"):
     keepGDF[f"speed_y_{n}s"] = keepGDF[f"dist_y_{n}s"] / n
 
     keepGDF["track_id_backup"] = keepGDF["track_id"]
-    # keepGDF["track_id_break"] = np.where(keepGDF["dist"] > 1, 1, 0)
-    # keepGDF["track_id_update"] = keepGDF["track_id_break"].fillna(0).astype(int)
-    # keepGDF["track_id_update"] = keepGDF.groupby("track_id")["track_id_update"].cumsum()
-    # keepGDF["track_id_combo"] = (
-    #     keepGDF["track_id"].astype(int).astype(str)
-    #     + "_"
-    #     + keepGDF["track_id_update"].astype(str)
-    # )
-    # keepGDF["track_id"] = keepGDF["track_id_combo"]
     import gc
 
     gc.collect()
