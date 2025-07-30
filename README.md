@@ -6,7 +6,7 @@
 * For more detailed code overview, please refer to [DeepWiki](https://deepwiki.com/brookefzy/uvi-public-space)
 
 ## Usage
-python>=3.8
+python=3.12
 ### Input
 common object detection output with these fields
 ```
@@ -18,15 +18,6 @@ run `main.py` to transform the sample csv and get group detection results
 
 ## Citation
 ```
-@article{salazarfan2025shifting,
-  title={Shifting Patterns of Social Interaction: Exploring the Social Life of Urban Spaces Through AI},
-  author={Salazar-Miranda, Arianna and Fan, Zhuangyuan and Baick, Michael B and Hampton, Keith N and Duarte, Fabio and Loo, Becky PY and Glaeser, Edward L and Ratti, Carlo},
-  year={2025},
-  journal={Proc. Natl. Acad. Sci. U.S.A.},
-  volume={122},
-  number={30},
- doi={https://doi-org.eproxy.lib.hku.hk/10.1073/pnas.2424662122}
-}
 @article{loo2023social,
   title={Social interaction in public space: Spatial edges, moveable furniture, and visual landmarks},
   author={Loo, Becky PY and Fan, Zhuangyuan},
